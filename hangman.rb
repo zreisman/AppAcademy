@@ -1,50 +1,47 @@
-require 'byebug'
-
 class Hangman
   attr_reader :guesses, :word, :result, :mistakes
 
   def initialize(guesser, checker)
-    @guesses = []
     @mistakes = 0
     @guesser = guesser
     @checker = checker
   end
 
   def start_game
-
     @checker.pick_word
 
-    until won? || @mistakes > 5
+    until won? || @mistakes >= 6
       p @mistakes
-
-      display(@checker.compare(@guesser.guess))
+      guess = @guesser.guess
+      display(@checker.compare(guess))
+      @mistakes += @checker.mistake?(guess)
     end
 
-    if @mistakes > 5
-      puts "You're hung"
-    else
-      puts "You win!"
-    end
+    (won? && (@mistakes < 6)) ? puts("You win") : puts("You're hanged!")
+
   end
 
+
+
   def display(stuff)
-    p stuff
+    p stuff.join
   end
 
   def won?
-    !@result.include?("_")
+    @checker.won?
   end
 end
 
 class ComputerPlayer
   attr_reader :word, :dictionary
 
-  def compare(guess)
-    @mistakes += 1 unless @word.include?(@guesses.last)# will be undone if change made
+  def mistake?(guess)
+    @word.include?(guess) ? 0 : 1
+  end
 
+  def compare(guess)
     @word.each_with_index do |letter, idx|
       if guess == letter
-        # @mistakes -= 1 unless @result.include?(letter)
         @result[idx] = letter
       end
     end
@@ -69,15 +66,37 @@ class ComputerPlayer
 
   def guess
     ("a".."z").to_a.sample
+  end
 
+  def won?
+    !@result.include?("_")
   end
 
 end
 
 class HumanPlayer
+  attr_accessor :result
+
+  def initialize
+    @result = ["_"]
+  end
+
+  def compare(guess)
+    puts "The computer guessed #{guess}:"
+    puts "Please input the response followed by "\
+            "false if the computer guess is wrong"
+    response = gets.chomp.split(' ')
+    @mistake = !response.last
+    @result = response.first.split('')
+  end
+
+  def mistake?(guess)
+    @mistake ? 1 : 0
+  end
 
   def pick_word
-    puts "Write your word down"
+    puts "Write your word down!"
+    sleep(5)
   end
 
   def guess
@@ -85,9 +104,14 @@ class HumanPlayer
     gets.chomp
   end
 
+  def won?
+    !@result.include?("_")
+  end
+
 end
 
 computer = ComputerPlayer.new
 human = HumanPlayer.new
 
-Hangman.new(computer)
+game = Hangman.new(computer, human)
+game.start_game
