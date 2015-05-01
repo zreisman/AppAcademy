@@ -21,9 +21,9 @@ class Man
   attr_accessor :king, :pos
   attr_reader :color
 
-  def initialize(pos, color)
+  def initialize(pos, color, king = false)
     @pos = pos
-    @king = false
+    @king = king
     @color = color
   end
 
