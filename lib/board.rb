@@ -1,4 +1,5 @@
 require_relative 'piece'
+require_relative 'errors'
 require 'byebug'
 
 class CheckerBoard
@@ -25,6 +26,7 @@ class CheckerBoard
       target_pos = find_between(start_pos, end_pos)
       imprison(target_pos)
       move!(start_pos, end_pos)
+      true
   end
 
   def dup
@@ -50,13 +52,11 @@ class CheckerBoard
 
   def move(start_pos, end_pos)   # ADD CHECK FOR NOT YOUR MOVE
     if valid_attack?(start_pos, end_pos)
-      puts "Attack!"
       attack!(start_pos, end_pos)
     elsif valid_move?(start_pos, end_pos)
-      puts "Regular move!"
       move!(start_pos, end_pos)
     else
-      raise "Invalid move!"
+      raise InvalidMove.new
     end
   end
 
@@ -64,12 +64,21 @@ class CheckerBoard
     self[end_pos] = self[start_pos]
     self[start_pos].pos = end_pos
     self[start_pos] = nil
-    true
+    false
   end
 
   def on_board?(pos)
     return true if pos[0].between?(0,7) && pos[0].between?(0,7)
     false
+  end
+
+
+  def perform_moves(move_sequence)
+    slide = true
+    until move_sequence.count < 2 || slide == false
+      current = move_sequence.shift
+      slide = move(current, move_sequence.first)
+    end
   end
 
   def set_board
@@ -85,26 +94,34 @@ class CheckerBoard
       end
     end
   end
-end
 
-def valid_attack?(start_pos, end_pos) #Square in pieces attack moves
-  return false unless self[start_pos].attack_moves.include?(end_pos)
-  target_pos = find_between(start_pos, end_pos)
-  return false if self[target_pos].nil?
-  return false if self[target_pos].color == self[start_pos].color
-  true
-end
+  def valid_attack?(start_pos, end_pos) #Square in pieces attack moves
+    return false unless self[start_pos].attack_moves.include?(end_pos)
+    target_pos = find_between(start_pos, end_pos)
+    return false if self[target_pos].nil?
+    self[target_pos].color != self[start_pos].color
+  end
 
-def valid_move?(start_pos, end_pos) #
-  return false unless self[start_pos].moves.include?(end_pos) ||
-              self[start_pos].attack_moves.include?(end_pos)
-  return false if self[start_pos].nil?
-  return false if !on_board?(start_pos) || !on_board?(end_pos)
-  true
+  def valid_move?(start_pos, end_pos) #
+    return false unless self[start_pos].moves.include?(end_pos)
+    return false if self[start_pos].nil?
+    on_board?(start_pos)
+  end
+
+  def validate_moves(move_sequence)
+    duped = self.dup
+
+    until move_sequence.count < 2
+      current = move_sequence.shift
+      duped.move(current, move_sequence.first)
+    end
+
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME
 
   board = CheckerBoard.new
   board.set_board
+  board.perform_moves([[5,2],[4,3],[3,4]])
 end

@@ -31,6 +31,10 @@ class Man
     moves(true)
   end
 
+  # def slide_moves
+  #   moves(false)
+  # end
+
   def moves(attack = false)
     attack == false ? deltas = SLIDE_DELTAS : deltas = ATTACK_DELTAS
     all_moves = deltas.map {|delta| vector(delta)}

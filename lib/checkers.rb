@@ -7,6 +7,51 @@ class Checkers
 
   def initialize
     @board = CheckerBoard.new
+    @turn = -1
+  end
+
+  def game_over?
+    # Not implemented yet
+  end
+
+  def start_game
+    puts "Welcome to American Checkers!".red
+    puts "Player 1, Enter your name:".yellow
+    @player1 = gets.chomp
+    puts "Player 2, Enter your name".green
+    @player2 = gets.chomp
+
+    until game_over?
+      render_board
+      @turn == -1 ? player = @player1 : player = @player2
+      moves = prompt_start(player)
+      if @board[moves.first].color == :red && @turn != -1
+        puts "Not your turn".blue
+        next
+      end
+      @board.perform_moves(moves)
+      @turn *= -1
+    end
+  end
+
+  def prompt_moves(start_pos, player)
+    multi = true
+    moves = [start_pos]
+    while multi
+      puts "#{player}, Enter you move:"
+      raw = gets.chomp
+      moves = raw.split('').map {|i| i.to_i }
+      puts "F, Enter when finish entering:"
+      gets.chomp.upcase == "F" ? multi = false : multi = true
+    end
+    moves
+  end
+
+  def prompt_start(player)
+    puts "#{player}, Which piece would you like to move?"
+    raw = gets.chomp
+    start_pos = raw.split('').map {|i| i.to_i }
+    prompt_moves(start_pos, player)
   end
 
   def render_board
@@ -41,9 +86,8 @@ end
 
 
 if __FILE__ == $PROGRAM_NAME
-
   game = Checkers.new
   game.board.set_board
-  game.render_board
+  game.start_game
 
 end
