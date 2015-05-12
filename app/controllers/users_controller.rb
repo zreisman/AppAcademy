@@ -1,8 +1,4 @@
 class UsersController < ApplicationController
-  def index
-    @users = User.all
-    render json: @users
-  end
 
   def create
     user = User.new(user_params)
@@ -14,6 +10,18 @@ class UsersController < ApplicationController
         json: user.errors.full_messages, status: :unprocessable_entity
       )
     end
+  end
+
+  def destroy
+    @user = User.find(params[:id])
+    @user.destroy
+
+    render json: @user
+  end
+
+  def index
+    @users = User.all
+    render json: @users
   end
 
   def show
@@ -33,12 +41,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def destroy
-    @user = User.find(params[:id])
-    @user.destroy
-    
-    render json: @user
-  end
 
   private
 
