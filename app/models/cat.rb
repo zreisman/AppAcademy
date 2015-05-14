@@ -5,6 +5,13 @@ class Cat < ActiveRecord::Base
 
   CAT_COLORS = %w(black white orange brown)
 
+  belongs_to(
+    :owner,
+    class_name: 'User',
+    foreign_key: :user_id,
+    primary_key: :id
+  )
+
   has_many(
     :rental_requests,
     class_name: "CatRentalRequest",
@@ -21,6 +28,10 @@ class Cat < ActiveRecord::Base
 
   validates :color, inclusion: CAT_COLORS
   validates :sex, inclusion: %w(M F)
+
+  def owner_name
+    owner ? owner.user_name : "No owner :("
+  end
 
   def age
     time_ago_in_words(birth_date)

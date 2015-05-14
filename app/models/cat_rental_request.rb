@@ -3,15 +3,16 @@ class CatRentalRequest < ActiveRecord::Base
 
   belongs_to :cat
 
+  belongs_to(
+   :requester,
+   class_name: 'User',
+   foreign_key: :user_id,
+   primary_key: :id
+   )
+
   after_initialize :assign_pending_status
 
-  validates(
-    :cat_id,
-    :end_date,
-    :start_date,
-    :status,
-    presence: true
-  )
+  validates :cat_id, :end_date, :start_date, :status, :requester, presence: true
   validates :status, inclusion: STATUS_STATES
   validate :start_must_come_before_end
   validate :does_not_overlap_approved_request
