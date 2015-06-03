@@ -13,13 +13,13 @@
    <p><%%= pokemon.escape('defense') %></p>
    <p><%%= pokemon.escape('moves') %></p>
 
-   <span style="font-weight: bold;">Toys:</span><br><br><br><br>
+   <br><br><br><br><br>
+   <span style="font-weight: bold;">Toys:</span>
    <ul class="toys"></ul>
  </div>
 </script>
 
 <script type="text/template" id="toy-list-item-template">
-
   <li class="toy-list-item" data-id="<%%= toy.get('id') %>"
     data-pokemon-id="<%%= toy.get('pokemon_id') %>">
       name:  <%%= toy.escape('name') %><br>
