@@ -1,10 +1,22 @@
-function Something () {
-
-  this.name: "A Thing";
-  this.printstuff: function () {
-    console.log("stuff");
-  };
-
+Function.prototype.myBind = function(obj) {
+  var fn = this
+  return function() {
+    return fn.apply(obj)
+  }
 }
 
-athing = new Something()
+
+var Thing = function() {
+}
+
+
+var Thing.prototype.doStuff = function() {
+  console.log("this is " + this)
+}
+
+doStuff()
+var cheese = "cheese"
+doStuff.myBind(cheese)
+
+
+doStuff()
